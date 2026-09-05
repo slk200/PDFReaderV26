@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="10.0" vgap="10.0" prefWidth="450.0"
+          styleClass="glass-panel" xmlns="http://javafx.com/javafx/26.0.2"
+          fx:controller="org.slk200.pdfreaderv26.controller.MarkController">
+    <padding>
+        <Insets bottom="18.0" left="18.0" right="18.0" top="18.0"/>
+    </padding>
+    <columnConstraints>
+        <ColumnConstraints minWidth="70.0"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+    </rowConstraints>
+
+    <Label text="纸张类型" GridPane.rowIndex="0"/>
+    <ComboBox fx:id="paperTypeCombo" editable="true" maxWidth="1.7976931348623157E308"
+              promptText="选择或输入纸张类型" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+    <Label text="纸张大小" GridPane.rowIndex="1"/>
+    <ComboBox fx:id="paperSizeCombo" editable="true" maxWidth="1.7976931348623157E308"
+              promptText="选择或输入纸张大小" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+    <Label text="单双面" GridPane.rowIndex="2"/>
+    <HBox alignment="CENTER_LEFT" spacing="12.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <RadioButton fx:id="singleSideRadio" mnemonicParsing="false" selected="true" text="单面"/>
+        <RadioButton fx:id="doubleSideRadio" mnemonicParsing="false" text="双面"/>
+    </HBox>
+
+    <Label text="颜色" GridPane.rowIndex="3"/>
+    <HBox alignment="CENTER_LEFT" spacing="12.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+        <RadioButton fx:id="bwRadio" mnemonicParsing="false" selected="true" text="黑白"/>
+        <RadioButton fx:id="colorRadio" mnemonicParsing="false" text="彩色"/>
+    </HBox>
+
+    <Label text="页数范围" GridPane.rowIndex="4"/>
+    <HBox alignment="CENTER_LEFT" spacing="12.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <RadioButton fx:id="allPagesRadio" mnemonicParsing="false" selected="true" text="全部"/>
+        <RadioButton fx:id="customPagesRadio" mnemonicParsing="false" text="范围"/>
+        <Spinner fx:id="rangeStartSpinner" editable="true" prefWidth="82.0"/>
+        <Label text="-"/>
+        <Spinner fx:id="rangeEndSpinner" editable="true" prefWidth="82.0"/>
+    </HBox>
+
+    <Label text="打印份数" GridPane.rowIndex="5"/>
+    <Spinner fx:id="copiesSpinner" editable="true" prefWidth="90.0"
+             GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+    <Label text="封装工艺" GridPane.rowIndex="6"/>
+    <ComboBox fx:id="bindingCombo" editable="true" maxWidth="1.7976931348623157E308"
+              promptText="选择或输入封装工艺" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+
+    <Label text="印后工艺" GridPane.rowIndex="7"/>
+    <ComboBox fx:id="postPressCombo" editable="true" maxWidth="1.7976931348623157E308"
+              promptText="选择或输入印后工艺" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+
+    <Label text="备注" GridPane.rowIndex="8" GridPane.valignment="TOP"/>
+    <TextArea fx:id="noteArea" prefRowCount="3" promptText="其他需要说明的内容" wrapText="true"
+              GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+    <stylesheets>
+        <URL value="@../css/custom.css"/>
+    </stylesheets>
+</GridPane>
