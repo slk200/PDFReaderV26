@@ -15,8 +15,8 @@ public class AboutController {
         visitWebPage("https://github.com/freemansoft/jacob-project");
     }
 
-    public void visit_iText() {
-        visitWebPage("https://itextpdf.com/");
+    public void visit_PDFBox() {
+        visitWebPage("https://pdfbox.apache.org/");
     }
 
     public void visit_SQLLite() {

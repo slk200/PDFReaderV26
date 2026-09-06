@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 import org.slk200.pdfreaderv26.constant.ImageSource;
+import org.slk200.pdfreaderv26.constant.CustomCSS;
 import org.slk200.pdfreaderv26.controller.SettingController;
 import org.slk200.pdfreaderv26.manager.ThemeManager;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Created by tizzer on 2019/1/21.
+ * 设置弹窗
  */
 public class SettingDialog extends Dialog<Boolean> {
 
@@ -29,7 +30,7 @@ public class SettingDialog extends Dialog<Boolean> {
         settingController.setStage(stage);
 
         this.setTitle("设置");
-        this.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/org/slk200/pdfreaderv26/css/custom.css")).toExternalForm());
+        this.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource(CustomCSS.LOAD)).toExternalForm());
         ThemeManager.decorate(this.getDialogPane());
         this.getDialogPane().setContent(content);
         this.setResizable(true);

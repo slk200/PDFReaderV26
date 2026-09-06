@@ -33,9 +33,9 @@
     <HBox alignment="CENTER_LEFT" spacing="3.0">
         <Text fill="steelblue" text="powered"/>
         <Text fill="coral" text="by"/>
-        <Hyperlink focusTraversable="false" onAction="#visit_iText" text="iText">
+        <Hyperlink focusTraversable="false" onAction="#visit_PDFBox" text="PDFBox">
             <tooltip>
-                <Tooltip text="https://itextpdf.com/"/>
+                <Tooltip text="https://pdfbox.apache.org/"/>
             </tooltip>
         </Hyperlink>
     </HBox>
@@ -57,7 +57,7 @@
         <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../image/github@48px.png"/>
         </ImageView>
-        <Hyperlink focusTraversable="false" onAction="#visit_github" text="Ver 26.0.0">
+        <Hyperlink focusTraversable="false" onAction="#visit_github" text="Ver 26.0.1">
             <tooltip>
                 <Tooltip text="https://github.com/slk200/PDFReader"/>
             </tooltip>

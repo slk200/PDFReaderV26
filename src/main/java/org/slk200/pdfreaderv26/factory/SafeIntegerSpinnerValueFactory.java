@@ -10,7 +10,7 @@ public class SafeIntegerSpinnerValueFactory extends SpinnerValueFactory<Integer>
     private final int min;
     private final int max;
     private final int defaultValue;
-    private final ObjectProperty<Integer> value = new SimpleObjectProperty<Integer>(this, "value") {
+    private final ObjectProperty<Integer> value = new SimpleObjectProperty<>(this, "value") {
         @Override
         public void set(Integer newValue) {
             if (newValue == null) {
@@ -56,7 +56,7 @@ public class SafeIntegerSpinnerValueFactory extends SpinnerValueFactory<Integer>
     }
 
     private int clamp(int val) {
-        return Math.max(min, Math.min(max, val));
+        return Math.clamp(val, min, max);
     }
 
 }

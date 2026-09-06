@@ -1,44 +1,127 @@
 package org.slk200.pdfreaderv26.manager;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.application.ColorScheme;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.Scene;
 import javafx.scene.control.DialogPane;
-import javafx.util.Duration;
 import org.slk200.pdfreaderv26.constant.ThemeMode;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 /**
- * 主题管理器
+ * 跨平台系统主题监听工具类（基于 JavaFX 22+ Platform.Preferences API）
+ * <p>
+ * 支持 Windows、macOS、Linux 三大平台，自动获取系统深色/浅色模式，
+ * 并支持实时监听主题切换事件。
+ * <p>
+ * 使用示例：
+ * <pre>
+ *   // 初始化（在 JavaFX Application Thread 中调用）
+ *   SystemThemeManager.init();
  *
- * <p>负责应用浅色/深色主题，支持跟随Windows系统主题自动切换。</p>
+ *   // 获取当前是否为暗黑模式
+ *   boolean isDark = SystemThemeManager.isDarkMode();
+ *
+ *   // 监听主题变化
+ *   SystemThemeManager.addListener(isDark -> {
+ *       System.out.println("主题切换为: " + (isDark ? "暗黑" : "浅色"));
+ *   });
+ *
+ *   // 自动将主题应用到 Scene
+ *   SystemThemeManager.applyTheme(scene, "dark.css", "light.css");
+ * </pre>
  */
-public class ThemeManager {
+public final class ThemeManager {
+
+    private static final Logger LOGGER = Logger.getLogger(ThemeManager.class.getName());
+
+    private static final ReadOnlyObjectWrapper<ColorScheme> colorSchemeProperty =
+            new ReadOnlyObjectWrapper<>();
 
     private static final String DARK_STYLE_CLASS = "dark";
     private static final String PREF_KEY_THEME = "themeMode";
-    private static final String PERSONALIZE_KEY =
-            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
 
     private static ThemeMode currentMode = ThemeMode.LIGHT;
-    private static Scene scene;
-    private static Timeline systemWatcher;
+    private static Scene appScene;
 
-    /**
-     * 初始化主题管理器（在显示窗口后调用）
-     *
-     * @param appScene 主窗口场景
-     */
-    public static void init(Scene appScene) {
-        scene = appScene;
+    private static boolean initialized = false;
+
+    public static void init(Scene scene) {
+        appScene = scene;
+        initSystemTheme();
         currentMode = loadMode();
         applyMode(currentMode);
-        startSystemWatcher();
+    }
+
+    /**
+     * 初始化主题管理器，读取当前系统主题并注册监听器。
+     * <p>
+     * 必须在 JavaFX Application Thread 中调用（通常在 Application.start() 内）。
+     * 重复调用不会重复注册。
+     */
+    private static void initSystemTheme() {
+        if (initialized) {
+            return;
+        }
+
+        Platform.Preferences preferences = Platform.getPreferences();
+
+        ColorScheme initial = preferences.getColorScheme();
+        colorSchemeProperty.set(initial);
+
+        preferences.colorSchemeProperty().addListener((_, _, newScheme) -> {
+            if (newScheme != null && !newScheme.equals(colorSchemeProperty.get())) {
+                colorSchemeProperty.set(newScheme);
+                notifyListeners(newScheme == ColorScheme.DARK);
+            }
+        });
+
+        initialized = true;
+    }
+
+    /**
+     * 获取当前是否为暗黑模式。
+     * 调用前需先调用 {@link #initSystemTheme()}。
+     *
+     * @return true 表示暗黑模式，false 表示浅色模式
+     */
+    public static boolean isDarkMode() {
+        ensureInitialized();
+        return colorSchemeProperty.get() == ColorScheme.DARK;
+    }
+
+    /**
+     * 获取当前系统主题方案。
+     *
+     * @return ColorScheme.LIGHT 或 ColorScheme.DARK
+     */
+    public static ColorScheme getColorScheme() {
+        ensureInitialized();
+        return colorSchemeProperty.get();
+    }
+
+    /**
+     * 添加主题变化监听器。
+     *
+     * @param listener 回调函数，参数 isDark 表示切换后是否为暗黑模式
+     */
+    public static void addListener(ThemeChangeListener listener) {
+        ensureInitialized();
+        themeChangeListeners.add(listener);
+    }
+
+    /**
+     * 移除主题变化监听器。
+     *
+     * @param listener 要移除的监听器
+     */
+    public static void removeListener(ThemeChangeListener listener) {
+        themeChangeListeners.remove(listener);
     }
 
     /**
@@ -69,6 +152,27 @@ public class ThemeManager {
     }
 
     /**
+     * 根据当前系统主题自动为 Scene 应用对应的 CSS 样式表。
+     * <p>
+     * 样式表路径为 classpath 资源路径，例如 "css/dark.css"。
+     *
+     */
+    public static void applyMode(ThemeMode mode) {
+        if (appScene == null) {
+            return;
+        }
+
+        ensureInitialized();
+        boolean dark = isDarkEffective(mode);
+        boolean hasDark = appScene.getRoot().getStyleClass().contains(DARK_STYLE_CLASS);
+        if (dark && !hasDark) {
+            appScene.getRoot().getStyleClass().add(DARK_STYLE_CLASS);
+        } else if (!dark && hasDark) {
+            appScene.getRoot().getStyleClass().remove(DARK_STYLE_CLASS);
+        }
+    }
+
+    /**
      * 设置主题模式并立即生效、持久化
      *
      * @param mode 目标主题模式
@@ -79,21 +183,11 @@ public class ThemeManager {
         applyMode(mode);
     }
 
-    /**
-     * 根据主题模式渲染界面
-     *
-     * @param mode 主题模式
-     */
-    private static void applyMode(ThemeMode mode) {
-        if (scene == null) {
-            return;
-        }
-        boolean dark = isDarkEffective(mode);
-        boolean hasDark = scene.getRoot().getStyleClass().contains(DARK_STYLE_CLASS);
-        if (dark && !hasDark) {
-            scene.getRoot().getStyleClass().add(DARK_STYLE_CLASS);
-        } else if (!dark && hasDark) {
-            scene.getRoot().getStyleClass().remove(DARK_STYLE_CLASS);
+    public static void setDarkMode(boolean dark) {
+        if (dark) {
+            applyMode(ThemeMode.DARK);
+        } else {
+            applyMode(ThemeMode.LIGHT);
         }
     }
 
@@ -114,55 +208,12 @@ public class ThemeManager {
     }
 
     /**
-     * 读取Windows系统当前的深浅色设置
+     * 判断当前系统是否为深色主题
      *
-     * <p>注册表 AppsUseLightTheme：1=浅色，0=深色。读取失败时默认浅色。</p>
-     *
-     * @return true表示系统当前为深色模式
+     * @return 返回当前系统主题色
      */
-    public static boolean isSystemDark() {
-        try {
-            Process process = Runtime.getRuntime().exec(
-                    new String[]{"reg", "query", PERSONALIZE_KEY, "/v", "AppsUseLightTheme"});
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), "GBK"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (line.contains("AppsUseLightTheme")) {
-                        String value = line.trim();
-                        //取行末数值（格式形如 "... REG_DWORD    0x1"）
-                        String number = value.substring(value.lastIndexOf(' ') + 1).trim();
-                        return number.endsWith("0");
-                    }
-                }
-            }
-            process.waitFor();
-        } catch (Exception e) {
-            Logger.getLogger(ThemeManager.class.getName()).log(Level.WARNING, "读取系统颜色模式错误", e);
-        }
-        return false;
-    }
-
-    /**
-     * 启动系统主题监听（跟随模式下每2秒检查一次）
-     */
-    private static void startSystemWatcher() {
-        if (systemWatcher != null) {
-            systemWatcher.stop();
-        }
-        boolean[] lastDark = {isDarkEffective(currentMode)};
-        systemWatcher = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
-            if (currentMode != ThemeMode.SYSTEM) {
-                return;
-            }
-            boolean dark = isSystemDark();
-            if (dark != lastDark[0]) {
-                lastDark[0] = dark;
-                applyMode(currentMode);
-            }
-        }));
-        systemWatcher.setCycleCount(Timeline.INDEFINITE);
-        systemWatcher.play();
+    private static boolean isSystemDark() {
+        return getColorScheme() == ColorScheme.DARK;
     }
 
     /**
@@ -188,5 +239,41 @@ public class ThemeManager {
     private static void saveMode(ThemeMode mode) {
         Preferences.userNodeForPackage(ThemeManager.class)
                 .put(PREF_KEY_THEME, mode.name());
+    }
+
+    private static final List<ThemeChangeListener> themeChangeListeners =
+            new CopyOnWriteArrayList<>();
+
+    private static void ensureInitialized() {
+        if (!initialized) {
+            LOGGER.warning("SystemThemeManager 尚未初始化，请先调用 SystemThemeManager.init()");
+        }
+    }
+
+    /**
+     * 通知所有主题切换监听器
+     * @param isDark 是否为深色主题
+     */
+    private static void notifyListeners(boolean isDark) {
+        for (ThemeChangeListener listener : themeChangeListeners) {
+            try {
+                listener.onThemeChanged(isDark);
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "通知所有主题切换监听器出错", e);
+            }
+        }
+    }
+
+    /**
+     * 主题变化监听器函数式接口
+     */
+    @FunctionalInterface
+    public interface ThemeChangeListener {
+        /**
+         * 当系统主题发生变化时回调。
+         *
+         * @param isDark true 表示切换为暗黑模式，false 表示切换为浅色模式
+         */
+        void onThemeChanged(boolean isDark);
     }
 }

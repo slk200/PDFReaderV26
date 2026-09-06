@@ -29,6 +29,7 @@ public class MainApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         ThemeManager.init(scene);
+        mainController.initThemeSwitch();
         primaryStage.setMinWidth(1300);
         primaryStage.setMinHeight(800);
     }

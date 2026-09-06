@@ -18,33 +18,50 @@ import java.util.Objects;
  */
 public class TicketController {
 
-    // --- UI Components ---
-    @FXML private Label fileLabel;
-    @FXML private Label paperTypeLabel;
-    @FXML private Label pageSizeLabel; // 修正了原代码中的拼写错误 pagerSize -> pageSize
-    @FXML private Label singleOrDoubleLabel;
-    @FXML private Label colorLabel;
-    @FXML private Label pageRangeLabel;
-    @FXML private Label printCopiesLabel;
-    @FXML private Label packagingLabel;
-    @FXML private Label postPressLabel;
-    @FXML private Label noteLabel;
-    @FXML private Button lastButton;
-    @FXML private Button nextButton;
-    @FXML private Label updateTimeLabel;
-    @FXML private TableColumn<TicketContent, String> pageColumn;
-    @FXML private TableColumn<TicketContent, String> noteColumn;
-    @FXML private TableColumn<TicketContent, String> fileNameColumn;
-    @FXML private Label ticketIdLabel;
-    @FXML private TableView<TicketContent> ticketContentTable;
-    @FXML private Button updateButton;
-    @FXML private ListView<TicketId> ticketIdList;
+    @FXML
+    private Label fileLabel;
+    @FXML
+    private Label paperTypeLabel;
+    @FXML
+    private Label paperSizeLabel;
+    @FXML
+    private Label singleOrDoubleLabel;
+    @FXML
+    private Label colorLabel;
+    @FXML
+    private Label pageRangeLabel;
+    @FXML
+    private Label printCopiesLabel;
+    @FXML
+    private Label packagingLabel;
+    @FXML
+    private Label postPressLabel;
+    @FXML
+    private Label noteLabel;
+    @FXML
+    private Button lastButton;
+    @FXML
+    private Button nextButton;
+    @FXML
+    private Label updateTimeLabel;
+    @FXML
+    private TableColumn<TicketContent, String> pageColumn;
+    @FXML
+    private TableColumn<TicketContent, String> noteColumn;
+    @FXML
+    private TableColumn<TicketContent, String> fileNameColumn;
+    @FXML
+    private Label ticketIdLabel;
+    @FXML
+    private TableView<TicketContent> ticketContentTable;
+    @FXML
+    private Button updateButton;
+    @FXML
+    private ListView<TicketId> ticketIdList;
 
-    // --- Constants ---
     private static final int PAGE_SIZE = 100;
     private static final String STATE_COMPLETED = "1";
 
-    // --- State Variables ---
     private int selectIndex = 0;
     private int offset = 0;
     private int totalPage = 1;
@@ -64,16 +81,16 @@ public class TicketController {
      */
     private void setupTableColumns() {
         fileNameColumn.setCellValueFactory(new PropertyValueFactory<>("file_name"));
-        fileNameColumn.setCellFactory(col -> new TextTableCell<>());
+        fileNameColumn.setCellFactory(_ -> new TextTableCell<>());
 
         pageColumn.setCellValueFactory(new PropertyValueFactory<>("page"));
-        pageColumn.setCellFactory(col -> new TextTableCell<>(Pos.CENTER));
+        pageColumn.setCellFactory(_ -> new TextTableCell<>(Pos.CENTER));
 
         noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
-        noteColumn.setCellFactory(col -> new TextTableCell<>());
+        noteColumn.setCellFactory(_ -> new TextTableCell<>());
 
         // ListView 的 CellFactory 只需要设置一次
-        ticketIdList.setCellFactory(param -> new TicketIdListCell());
+        ticketIdList.setCellFactory(_ -> new TicketIdListCell());
     }
 
     /**
@@ -81,7 +98,7 @@ public class TicketController {
      */
     private void setupEventListeners() {
         // 工单列表点击事件
-        ticketIdList.setOnMousePressed(event -> {
+        ticketIdList.setOnMousePressed(_ -> {
             int currentIndex = ticketIdList.getSelectionModel().getSelectedIndex();
             // 防止重复点击同一项触发刷新
             if (currentIndex != -1 && currentIndex != selectIndex) {
@@ -94,7 +111,7 @@ public class TicketController {
         });
 
         // 详情表格点击事件
-        ticketContentTable.setOnMousePressed(event -> {
+        ticketContentTable.setOnMousePressed(_ -> {
             TicketContent selectedContent = ticketContentTable.getSelectionModel().getSelectedItem();
             if (selectedContent != null) {
                 fileLabel.setText(selectedContent.getFile_name());
@@ -209,15 +226,33 @@ public class TicketController {
             String value = kv[1].trim();
 
             switch (key) {
-                case "纸张类型": paperTypeLabel.setText(value); break;
-                case "纸张大小": pageSizeLabel.setText(value); break; // 修正变量引用
-                case "单双面": singleOrDoubleLabel.setText(value); break;
-                case "颜色": colorLabel.setText(value); break;
-                case "页数范围": pageRangeLabel.setText(value); break;
-                case "打印份数": printCopiesLabel.setText(value); break;
-                case "封装工艺": packagingLabel.setText(value); break;
-                case "印后工艺": postPressLabel.setText(value); break;
-                case "备注": noteLabel.setText(value); break;
+                case "纸张类型":
+                    paperTypeLabel.setText(value);
+                    break;
+                case "纸张大小":
+                    paperSizeLabel.setText(value);
+                    break; // 修正变量引用
+                case "单双面":
+                    singleOrDoubleLabel.setText(value);
+                    break;
+                case "颜色":
+                    colorLabel.setText(value);
+                    break;
+                case "页数范围":
+                    pageRangeLabel.setText(value);
+                    break;
+                case "打印份数":
+                    printCopiesLabel.setText(value);
+                    break;
+                case "封装工艺":
+                    packagingLabel.setText(value);
+                    break;
+                case "印后工艺":
+                    postPressLabel.setText(value);
+                    break;
+                case "备注":
+                    noteLabel.setText(value);
+                    break;
             }
         }
     }
@@ -228,7 +263,7 @@ public class TicketController {
     public void resetMark() {
         fileLabel.setText("文件");
         paperTypeLabel.setText("纸张类型");
-        pageSizeLabel.setText("纸张大小");
+        paperSizeLabel.setText("纸张大小");
         singleOrDoubleLabel.setText("单双面");
         colorLabel.setText("颜色");
         pageRangeLabel.setText("页数范围");

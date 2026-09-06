@@ -11,7 +11,7 @@ import org.slk200.pdfreaderv26.factory.SafeDoubleSpinnerValueFactory;
 import org.slk200.pdfreaderv26.manager.SafeSpinnerManager;
 import org.slk200.pdfreaderv26.manager.SpinnerEditorManager;
 import org.slk200.pdfreaderv26.util.DatabaseStore;
-import org.slk200.pdfreaderv26.util.PrefStorage;
+import org.slk200.pdfreaderv26.util.SharedPreferences;
 
 import java.io.File;
 import java.util.List;
@@ -22,12 +22,10 @@ import java.util.List;
  */
 public class SettingController {
 
-    // --- UI Components ---
     @FXML
     private TextField defaultPlace;
     @FXML
     private Label errorTip;
-
     @FXML
     private TableView<Extra> extraTable;
     @FXML
@@ -38,28 +36,24 @@ public class SettingController {
     private TextField nameField;
     @FXML
     private Spinner<Double> priceSpinner;
-
     @FXML
     private TableView<String> paperTypeTable;
     @FXML
     private TableColumn<String, String> paperTypeColumn;
     @FXML
     private TextField paperTypeField;
-
     @FXML
     private TableView<String> paperSizeTable;
     @FXML
     private TableColumn<String, String> paperSizeColumn;
     @FXML
     private TextField paperSizeField;
-
     @FXML
     private TableView<String> bindingTable;
     @FXML
     private TableColumn<String, String> bindingColumn;
     @FXML
     private TextField bindingField;
-
     @FXML
     private TableView<String> postPressTable;
     @FXML
@@ -67,18 +61,14 @@ public class SettingController {
     @FXML
     private TextField postPressField;
 
-    // --- Constants ---
     private static final String CATEGORY_PAPER_TYPE = "纸张类型";
     private static final String CATEGORY_PAPER_SIZE = "纸张大小";
     private static final String CATEGORY_BINDING = "封装工艺";
     private static final String CATEGORY_POST_PRESS = "印后工艺";
 
-    // --- State ---
     private boolean isDataModified = false;
     private boolean isOptionUpdated = false;
     private Stage stage;
-
-    // --- Lifecycle & Init ---
 
     /**
      * 初始化控制器，绑定数据与事件
@@ -121,7 +111,7 @@ public class SettingController {
     }
 
     private void loadDefaultDirectory() {
-        String defaultDirectory = PrefStorage.getInstance().getString();
+        String defaultDirectory = SharedPreferences.getInstance().getString();
         if (defaultDirectory != null && !defaultDirectory.isEmpty()) {
             File file = new File(defaultDirectory);
             if (file.exists()) {
@@ -147,7 +137,7 @@ public class SettingController {
 
         File selectedDirectory = directoryChooser.showDialog(stage);
         if (selectedDirectory != null) {
-            PrefStorage.getInstance().setString(selectedDirectory.getAbsolutePath());
+            SharedPreferences.getInstance().setString(selectedDirectory.getAbsolutePath());
             defaultPlace.setText(selectedDirectory.getAbsolutePath());
             errorTip.setText(null);
         }

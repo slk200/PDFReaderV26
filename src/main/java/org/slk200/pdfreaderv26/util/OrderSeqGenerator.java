@@ -140,34 +140,6 @@ public class OrderSeqGenerator {
         }
     }
 
-    /**
-     * 获取统计信息
-     */
-    public String getStats() {
-        return String.format("generated=%d, retries=%d, retryRate=%.2f%%",
-                totalGenerated.get(), totalRetries.get(),
-                totalGenerated.get() == 0 ? 0 :
-                        (double) totalRetries.get() / totalGenerated.get() * 100);
-    }
-
-    /**
-     * 关闭预编译语句
-     */
-    public void close() {
-        try {
-            psInsertIgnore.close();
-        } catch (SQLException ignored) {
-        }
-        try {
-            psSelect.close();
-        } catch (SQLException ignored) {
-        }
-        try {
-            psCasUpdate.close();
-        } catch (SQLException ignored) {
-        }
-    }
-
     // ========== 内部异常 ==========
 
     private static class CasConflictException extends RuntimeException {

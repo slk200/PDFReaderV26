@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Created by tizzer on 2019/1/21.
+ * 各类型文件计数处理器
  */
 public class FileCountHandler {
 
@@ -183,9 +183,8 @@ public class FileCountHandler {
             page = "0";
         } else if (type == FileType.IMAGE || type == FileType.OTHER) {
             fileState = FileState.WITHOUT_CONVERT;
-            page = "/";
+            page = "-";
         } else {
-            // Office 类型
             fileState = FileState.FAILED;
             page = "0";
         }

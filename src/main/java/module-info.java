@@ -4,8 +4,8 @@ module org.slk200.pdfreaderv26 {
     requires java.sql;
     requires java.desktop;
     requires java.prefs;
-    requires itext;
     requires io.github.osobolev.jacob;
+    requires org.apache.pdfbox;
 
     opens org.slk200.pdfreaderv26 to javafx.fxml;
     opens org.slk200.pdfreaderv26.component to javafx.fxml;

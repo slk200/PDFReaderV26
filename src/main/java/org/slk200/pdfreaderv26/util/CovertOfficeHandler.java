@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by tizzer on 2019/1/21.
+ * Office文件转换处理器
  *
  * <p>Office转PDF转换器：优先调用WPS Office的COM组件，
  * 若未找到WPS组件，则自动回退到Microsoft Office的COM组件。</p>
@@ -33,8 +33,8 @@ class CovertOfficeHandler {
     /**
      * word转为pdf
      *
-     * @param inFile
-     * @param outFile
+     * @param inFile 待转换的文件
+     * @param outFile 转换完的文件
      */
     static void word2pdf(String inFile, String outFile) {
         try {
@@ -58,7 +58,7 @@ class CovertOfficeHandler {
             ComThread.InitSTA();
             activeXComponent = new ActiveXComponent(progId);
             activeXComponent.setProperty("Visible", false);
-            Dispatch kwps = activeXComponent.getProperty("Documents").toDispatch();
+            Dispatch k_wps = activeXComponent.getProperty("Documents").toDispatch();
             Object[] obj = new Object[]{
                     inFile,
                     new Variant(false),
@@ -66,7 +66,7 @@ class CovertOfficeHandler {
                     new Variant(false),
                     new Variant("pwd")
             };
-            wps = Dispatch.invoke(kwps, "Open", Dispatch.Method, obj, new int[1]).toDispatch();
+            wps = Dispatch.invoke(k_wps, "Open", Dispatch.Method, obj, new int[1]).toDispatch();
             Dispatch.put(wps, "RemovePersonalInformation", false);
             Dispatch.call(wps, "ExportAsFixedFormat", outFile, WORD_TO_PDF_OPERAND);
         } finally {
@@ -87,8 +87,8 @@ class CovertOfficeHandler {
     /**
      * ppt转为pdf
      *
-     * @param inFile
-     * @param outFile
+     * @param inFile 待转换的文件
+     * @param outFile 转换完的文件
      */
     static void ppt2pdf(String inFile, String outFile) {
         try {
@@ -111,14 +111,14 @@ class CovertOfficeHandler {
         try {
             ComThread.InitSTA();
             activeXComponent = new ActiveXComponent(progId);
-            Dispatch kwpp = activeXComponent.getProperty("Presentations").toDispatch();
+            Dispatch k_wpp = activeXComponent.getProperty("Presentations").toDispatch();
             /*
              * call
              * param 4: ReadOnly
              * param 5: Untitled:the pointed file isTitled
              * param 6: WithWindow:the pointed file isVisible
              * */
-            wpp = Dispatch.call(kwpp, "Open", inFile, true, true, false).toDispatch();
+            wpp = Dispatch.call(k_wpp, "Open", inFile, true, true, false).toDispatch();
             Dispatch.call(wpp, "SaveAs", outFile, PPT_TO_PDF_OPERAND);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -140,8 +140,8 @@ class CovertOfficeHandler {
     /**
      * excel转为pdf
      *
-     * @param inFile
-     * @param outFile
+     * @param inFile 待转换的文件
+     * @param outFile 转换完的文件
      */
     static void excel2pdf(String inFile, String outFile) {
         try {
@@ -166,14 +166,14 @@ class CovertOfficeHandler {
             activeXComponent = new ActiveXComponent(progId);
             activeXComponent.setProperty("Visible", new Variant(false));
             activeXComponent.setProperty("AutomationSecurity", new Variant(3)); // 禁用宏
-            Dispatch ket = activeXComponent.getProperty("Workbooks").toDispatch();
+            Dispatch k_et = activeXComponent.getProperty("Workbooks").toDispatch();
 
             Object[] obj = new Object[]{
                     inFile,
                     new Variant(false),
                     new Variant(false)
             };
-            et = Dispatch.invoke(ket, "Open", Dispatch.Method, obj, new int[9]).toDispatch();
+            et = Dispatch.invoke(k_et, "Open", Dispatch.Method, obj, new int[9]).toDispatch();
             // trans form
             Object[] obj2 = new Object[]{
                     new Variant(EXCEL_TO_PDF_OPERAND), // PDF=0

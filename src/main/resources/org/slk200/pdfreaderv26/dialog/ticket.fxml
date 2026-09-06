@@ -64,7 +64,7 @@
                     <Font name="System Bold"/>
                 </font>
             </Label>
-            <Label fx:id="pageSizeLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308"
+            <Label fx:id="paperSizeLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308"
                    maxWidth="1.7976931348623157E308" styleClass="mark" text="纸张大小" textAlignment="CENTER"
                    textOverrun="CENTER_ELLIPSIS" GridPane.columnIndex="1">
                 <font>

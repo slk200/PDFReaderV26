@@ -8,6 +8,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.slk200.pdfreaderv26.component.BusyOverlay?>
 <?import org.slk200.pdfreaderv26.component.FloatingConvertButton?>
+<?import org.slk200.pdfreaderv26.component.ToggleSwitch?>
 <?import java.net.URL?>
 <StackPane prefHeight="800" prefWidth="1300" xmlns="http://javafx.com/javafx/26.0.2"
            xmlns:fx="http://javafx.com/fxml/1"
@@ -316,68 +317,87 @@
             </BorderPane>
         </center>
         <top>
-            <MenuBar BorderPane.alignment="CENTER">
-                <BorderPane.margin>
-                    <Insets/>
-                </BorderPane.margin>
-                <padding>
-                    <Insets bottom="2" left="6" right="6" top="2"/>
-                </padding>
-                <Menu mnemonicParsing="false" text="文件">
-                    <MenuItem mnemonicParsing="false" onAction="#scanDirectory" text="打开文件夹">
-                        <accelerator>
-                            <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                    <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem mnemonicParsing="false" onAction="#exit" text="退出">
-                        <accelerator>
-                            <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                </Menu>
-                <Menu mnemonicParsing="false" text="编辑">
-                    <MenuItem mnemonicParsing="false" onAction="#setting" text="设置">
-                        <accelerator>
-                            <KeyCodeCombination alt="DOWN" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                    <Menu fx:id="themeMenu" mnemonicParsing="false" text="主题">
-                        <accelerator>
-                            <KeyCodeCombination alt="DOWN" code="T" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                        <RadioMenuItem fx:id="lightThemeItem" mnemonicParsing="false" onAction="#themeLight"
-                                       text="浅色模式"/>
-                        <RadioMenuItem fx:id="darkThemeItem" mnemonicParsing="false" onAction="#themeDark"
-                                       text="深色模式"/>
-                        <RadioMenuItem fx:id="systemThemeItem" mnemonicParsing="false" onAction="#themeSystem"
-                                       text="跟随系统主题"/>
+            <StackPane>
+                <MenuBar>
+                    <padding>
+                        <Insets bottom="2" left="6" right="6" top="2"/>
+                    </padding>
+                    <Menu mnemonicParsing="false" text="文件">
+                        <MenuItem mnemonicParsing="false" onAction="#scanDirectory" text="打开文件夹">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" onAction="#exit" text="退出">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
                     </Menu>
-                    <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem fx:id="executeMenu" mnemonicParsing="false" onAction="#execute" text="执行">
-                        <accelerator>
-                            <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                    <MenuItem mnemonicParsing="false" onAction="#reset" text="恢复">
-                        <accelerator>
-                            <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                </Menu>
-                <Menu mnemonicParsing="false" text="帮助">
-                    <MenuItem mnemonicParsing="false" onAction="#history" text="历史">
-                        <accelerator>
-                            <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                    <MenuItem mnemonicParsing="false" onAction="#about" text="关于">
-                        <accelerator>
-                            <KeyCodeCombination alt="UP" code="F12" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
-                        </accelerator>
-                    </MenuItem>
-                </Menu>
-            </MenuBar>
+                    <Menu mnemonicParsing="false" text="编辑">
+                        <MenuItem mnemonicParsing="false" onAction="#setting" text="设置">
+                            <accelerator>
+                                <KeyCodeCombination alt="DOWN" code="S" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
+                        <Menu fx:id="themeMenu" mnemonicParsing="false" text="主题">
+                            <accelerator>
+                                <KeyCodeCombination alt="DOWN" code="T" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                            <RadioMenuItem fx:id="lightThemeItem" mnemonicParsing="false" onAction="#themeLight"
+                                           text="浅色模式"/>
+                            <RadioMenuItem fx:id="darkThemeItem" mnemonicParsing="false" onAction="#themeDark"
+                                           text="深色模式"/>
+                            <RadioMenuItem fx:id="systemThemeItem" mnemonicParsing="false" onAction="#themeSystem"
+                                           text="跟随系统主题"/>
+                        </Menu>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="executeMenu" mnemonicParsing="false" onAction="#execute" text="执行">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#reset" text="恢复">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="帮助">
+                        <MenuItem mnemonicParsing="false" onAction="#history" text="历史">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#about" text="关于">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="F12" control="DOWN" meta="UP" shift="UP"
+                                                    shortcut="UP"/>
+                            </accelerator>
+                        </MenuItem>
+                    </Menu>
+                </MenuBar>
+                <HBox alignment="CENTER_RIGHT" spacing="10" pickOnBounds="false">
+                    <padding>
+                        <Insets right="25"/>
+                    </padding>
+                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@image/light@32px.png"/>
+                    </ImageView>
+                    <ToggleSwitch fx:id="themeSwitch"/>
+                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@image/dark@32px.png"/>
+                    </ImageView>
+                </HBox>
+            </StackPane>
         </top>
     </BorderPane>
     <FloatingConvertButton fx:id="floatingConvertButton"/>

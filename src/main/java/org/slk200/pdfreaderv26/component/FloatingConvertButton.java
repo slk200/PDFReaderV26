@@ -70,7 +70,7 @@ public class FloatingConvertButton extends StackPane {
         toastPopup = new Popup();
         toastPopup.getContent().add(toast);
 
-        button.setOnAction(event -> pickFiles());
+        button.setOnAction(_ -> pickFiles());
 
         button.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles()) {
@@ -84,7 +84,7 @@ public class FloatingConvertButton extends StackPane {
                 button.getStyleClass().add("float-hover");
             }
         });
-        button.setOnDragExited(event -> {
+        button.setOnDragExited(_ -> {
             animateScale(1.0);
             button.getStyleClass().remove("float-hover");
         });
@@ -156,11 +156,11 @@ public class FloatingConvertButton extends StackPane {
                     bounds.getMaxX() - toast.getPrefWidth(),
                     bounds.getMinY() - toast.prefHeight(-1) - 12);
         }
-        toastHide = new Timeline(new KeyFrame(Duration.millis(4800), event -> {
+        toastHide = new Timeline(new KeyFrame(Duration.millis(4800), _ -> {
             FadeTransition fade = new FadeTransition(Duration.millis(400), toast);
             fade.setFromValue(1);
             fade.setToValue(0);
-            fade.setOnFinished(ev -> toastPopup.hide());
+            fade.setOnFinished(_ -> toastPopup.hide());
             fade.play();
         }));
         toastHide.play();

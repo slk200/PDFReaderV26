@@ -44,6 +44,7 @@ public class HistoryController {
     private TableColumn<ConvertRecord, String> statusColumn;
 
     private ObservableList<ConvertRecord> tempItems;
+
     private int TOTAL_RECORDS = 0;
     private int NOW_PAGE = 1;
     private int TOTAL_PAGE = 1;
@@ -66,11 +67,11 @@ public class HistoryController {
         convertRecordTableView.setPlaceholder(new Label("暂无转换记录"));
 
         //筛选与搜索实时生效
-        keywordField.textProperty().addListener((obs, o, n) -> loadRecords());
-        statusBox.valueProperty().addListener((obs, o, n) -> loadRecords());
-        fromPicker.valueProperty().addListener((obs, o, n) -> loadRecords());
-        toPicker.valueProperty().addListener((obs, o, n) -> loadRecords());
-        resetButton.setOnAction(event -> {
+        keywordField.textProperty().addListener((_, _, _) -> loadRecords());
+        statusBox.valueProperty().addListener((_, _, _) -> loadRecords());
+        fromPicker.valueProperty().addListener((_, _, _) -> loadRecords());
+        toPicker.valueProperty().addListener((_, _, _) -> loadRecords());
+        resetButton.setOnAction(_ -> {
             keywordField.clear();
             statusBox.setValue("全部");
             fromPicker.setValue(null);

@@ -158,13 +158,6 @@ public class DatabaseStore {
     }
 
     /**
-     * 查询历史记录（重载方法，无日期筛选）
-     */
-    public static synchronized List<ConvertRecord> query(String keyword, String status) {
-        return query(keyword, status, null, null);
-    }
-
-    /**
      * 查询历史记录，支持多条件筛选
      */
     public static synchronized List<ConvertRecord> query(String keyword, String status, String dateFrom, String dateTo) {
@@ -249,7 +242,7 @@ public class DatabaseStore {
      * 全量替换附加项（使用事务和批处理）
      */
     public static synchronized void replaceExtras(List<Extra> extras) {
-        String deleteSql = "DELETE FROM extra_item";
+        @SuppressWarnings("SqlWithoutWhere") String deleteSql = "DELETE FROM extra_item";
         String insertSql = "INSERT INTO extra_item(name, price) VALUES (?,?)";
         try {
             ensureConnection();

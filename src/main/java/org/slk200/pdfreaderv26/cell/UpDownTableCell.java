@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
@@ -19,6 +20,9 @@ public class UpDownTableCell<S> extends TableCell<S, Integer> {
     private final Button upButton;
     private final Button downButton;
     private Timeline timeline;
+
+    private static final int MAX_VALUE = 999;
+    private static final int MIN_VALUE = 1;
 
     public UpDownTableCell() {
         valLabel = new Label();
@@ -48,36 +52,45 @@ public class UpDownTableCell<S> extends TableCell<S, Integer> {
     public void allEvent() {
         upButton.setOnAction(_ -> increment());
         upButton.setOnMouseReleased(_ -> timeline.stop());
-        upButton.setOnMousePressed(_ -> {
-            timeline = new Timeline(
-                    new KeyFrame(Duration.millis(500), _ -> increment())
-            );
-            timeline.setCycleCount(Timeline.INDEFINITE);
-            timeline.play();
+        upButton.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                timeline = new Timeline(
+                        new KeyFrame(Duration.millis(100), _ -> increment())
+                );
+                timeline.setCycleCount(Timeline.INDEFINITE);
+                timeline.play();
+            }
         });
 
         downButton.setOnAction(_ -> decrement());
         downButton.setOnMouseReleased(_ -> timeline.stop());
-        downButton.setOnMousePressed(_ -> {
-            timeline = new Timeline(
-                    new KeyFrame(Duration.millis(500), _ -> decrement())
-            );
-            timeline.setCycleCount(Timeline.INDEFINITE);
-            timeline.play();
+        downButton.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                timeline = new Timeline(
+                        new KeyFrame(Duration.millis(100), _ -> decrement())
+                );
+                timeline.setCycleCount(Timeline.INDEFINITE);
+                timeline.play();
+            }
         });
     }
 
     private void increment() {
         int newVal = Integer.parseInt(valLabel.getText());
-        valLabel.setText(String.valueOf(++newVal));
-        incrementNext(getIndex());
+        newVal = newVal + 1;
+        if (newVal > MAX_VALUE) {
+            newVal = MAX_VALUE;
+        } else {
+            incrementNext(getIndex());
+        }
+        valLabel.setText(String.valueOf(newVal));
     }
 
     private void decrement() {
         int newVal = Integer.parseInt(valLabel.getText());
 
         newVal = newVal - 1;
-        if (newVal < 1) {
+        if (newVal < MIN_VALUE) {
             newVal = 1;
         } else {
             decrementNext(getIndex());

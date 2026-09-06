@@ -11,10 +11,9 @@ public class SafeDoubleSpinnerValueFactory extends SpinnerValueFactory<Double> {
     private final double max;
     private final double defaultValue;
 
-    private final ObjectProperty<Double> value = new SimpleObjectProperty<Double>(this, "value") {
+    private final ObjectProperty<Double> value = new SimpleObjectProperty<>(this, "value") {
         @Override
         public void set(Double newValue) {
-            // ⚠️ 核心修复：null → 默认值，在 property 底层拦截
             if (newValue == null) {
                 newValue = defaultValue;
             }
@@ -58,7 +57,7 @@ public class SafeDoubleSpinnerValueFactory extends SpinnerValueFactory<Double> {
     }
 
     private double clamp(double val) {
-        return Math.max(min, Math.min(max, val));
+        return Math.clamp(val, min, max);
     }
 
 }

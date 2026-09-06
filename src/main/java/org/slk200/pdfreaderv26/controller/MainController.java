@@ -1,7 +1,6 @@
 package org.slk200.pdfreaderv26.controller;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -13,6 +12,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.slk200.pdfreaderv26.bean.Extra;
@@ -25,9 +25,9 @@ import org.slk200.pdfreaderv26.cell.TextTableCell;
 import org.slk200.pdfreaderv26.cell.UpDownTableCell;
 import org.slk200.pdfreaderv26.component.BusyOverlay;
 import org.slk200.pdfreaderv26.component.FloatingConvertButton;
+import org.slk200.pdfreaderv26.component.ToggleSwitch;
 import org.slk200.pdfreaderv26.constant.FileState;
 import org.slk200.pdfreaderv26.constant.FileType;
-import org.slk200.pdfreaderv26.constant.StringSource;
 import org.slk200.pdfreaderv26.constant.ThemeMode;
 import org.slk200.pdfreaderv26.dialog.*;
 import org.slk200.pdfreaderv26.factory.SafeDoubleSpinnerValueFactory;
@@ -70,8 +70,8 @@ import static org.slk200.pdfreaderv26.constant.ThemeMode.SYSTEM;
  */
 public class MainController {
 
-    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
-
+    @FXML
+    private ToggleSwitch themeSwitch;
     @FXML
     private BusyOverlay busyOverlay;
     @FXML
@@ -157,27 +157,18 @@ public class MainController {
     @FXML
     private MenuItem pasteMarkMenuItem;
 
-    // ==================== 内部状态 ====================
-
-    /**
-     * 使用固定大小线程池，核心数至少为2，适配IO密集型的文件转换与PDF计数任务。
-     * 避免单线程下扫描和转换相互阻塞。
-     */
     private final ExecutorService executorService = Executors.newFixedThreadPool(
             Math.max(2, Runtime.getRuntime().availableProcessors()));
 
-    private final ObservableList<FileItem> items = FXCollections.observableArrayList();
+    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
+
+    private ThemeManager.ThemeChangeListener themeChangeListener;
 
     private String copiedMark;
     private Stage stage;
     private File selectedDirectory;
 
-    /**
-     * 当前累计总价（原变量名 sum 与局部变量冲突，重命名为 totalAmount）
-     */
     private double totalAmount;
-
-    // ==================== 初始化 ====================
 
     /**
      * 初始化控件绑定并首次加载数据。
@@ -206,22 +197,21 @@ public class MainController {
      * 初始化文件列表表格的列绑定与单元格工厂。
      */
     private void initFileTable() {
-        fileItemTableView.setItems(items);
         fileItemTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        fileItemTableView.setOnMousePressed(event -> syncSelectedPageToSpinner());
+        fileItemTableView.setOnMousePressed(_ -> syncSelectedPageToSpinner());
 
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("file_type"));
-        typeColumn.setCellFactory(col -> new FileTypeTableCell<>());
+        typeColumn.setCellFactory(_ -> new FileTypeTableCell<>());
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("file_name"));
-        nameColumn.setCellFactory(col -> new TextTableCell<>());
+        nameColumn.setCellFactory(_ -> new TextTableCell<>());
         stateColumn.setCellValueFactory(new PropertyValueFactory<>("file_state"));
-        stateColumn.setCellFactory(col -> new StateTableCell());
+        stateColumn.setCellFactory(_ -> new StateTableCell());
         pageColumn.setCellValueFactory(new PropertyValueFactory<>("file_page"));
-        pageColumn.setCellFactory(col -> new TextTableCell<>(Pos.CENTER));
+        pageColumn.setCellFactory(_ -> new TextTableCell<>(Pos.CENTER));
         pathColumn.setCellValueFactory(new PropertyValueFactory<>("file_path"));
-        pathColumn.setCellFactory(col -> new TextTableCell<>());
+        pathColumn.setCellFactory(_ -> new TextTableCell<>());
         noteColumn.setCellValueFactory(new PropertyValueFactory<>("file_note"));
-        noteColumn.setCellFactory(col -> new TextTableCell<>());
+        noteColumn.setCellFactory(_ -> new TextTableCell<>());
     }
 
     /**
@@ -251,7 +241,7 @@ public class MainController {
         extraColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         copiesColumn.setCellValueFactory(new PropertyValueFactory<>("num"));
-        copiesColumn.setCellFactory(param -> new UpDownTableCell<>() {
+        copiesColumn.setCellFactory(_ -> new UpDownTableCell<>() {
             @Override
             public void incrementNext(int index) {
                 super.incrementNext(index);
@@ -296,14 +286,37 @@ public class MainController {
         darkThemeItem.setToggleGroup(themeGroup);
         systemThemeItem.setToggleGroup(themeGroup);
 
-        themeMenu.setOnShowing(event -> {
+        themeMenu.setOnShowing(_ -> {
             ThemeMode currentMode = ThemeManager.getCurrentMode();
             if (currentMode == DARK) {
                 darkThemeItem.setSelected(true);
             } else if (currentMode == SYSTEM) {
+                themeChangeListener = isDark -> {
+                    ThemeManager.setDarkMode(isDark);
+                    themeSwitch.setSelected(isDark);
+                };
+                ThemeManager.addListener(themeChangeListener);
                 systemThemeItem.setSelected(true);
             } else {
                 lightThemeItem.setSelected(true);
+            }
+        });
+    }
+
+    public void initThemeSwitch() {
+        if (ThemeManager.getCurrentMode() == SYSTEM) {
+            themeSwitch.setSelected(ThemeManager.isDarkMode());
+        } else {
+            themeSwitch.setSelected(ThemeManager.getCurrentMode() == DARK);
+        }
+        themeSwitch.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                themeSwitch.setSelected(!themeSwitch.isSelected());
+                ThemeManager.setMode(themeSwitch.isSelected() ? DARK : ThemeMode.LIGHT);
+                if (themeChangeListener != null) {
+                    ThemeManager.removeListener(themeChangeListener);
+                    themeChangeListener = null;
+                }
             }
         });
     }
@@ -317,7 +330,7 @@ public class MainController {
      */
     public void setStage(Stage stage) {
         this.stage = stage;
-        stage.setOnCloseRequest(event -> shutdownExecutor());
+        stage.setOnCloseRequest(_ -> shutdownExecutor());
     }
 
     /**
@@ -340,7 +353,7 @@ public class MainController {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("选择文件夹");
 
-        String defaultPath = PrefStorage.getInstance().getString();
+        String defaultPath = SharedPreferences.getInstance().getString();
         File defaultDir = new File(defaultPath);
         if (defaultDir.exists()) {
             directoryChooser.setInitialDirectory(defaultDir);
@@ -418,11 +431,11 @@ public class MainController {
                             localPdfCounter.office2pdf(file.getFile_path(), file.getFile_type());
                             String page = localPdfCounter.getPage();
                             file.setFile_page(page);
-                            // 如果路径里有 a.pdf 和 a.doc 同时存在，a.doc 不会执行转换，page 也显示 /
-                            file.setFile_state("/".equals(page) ? FileState.WITHOUT_CONVERT : FileState.CONVERT_DONE);
+                            // 如果路径里有 a.pdf 和 a.doc 同时存在，a.doc 不会执行转换，page 也显示 -
+                            file.setFile_state("-".equals(page) ? FileState.WITHOUT_CONVERT : FileState.CONVERT_DONE);
                             break;
                         case PDF:
-                            localPdfCounter.count(new File(file.getFile_path()));
+                            localPdfCounter.parsePDF(new File(file.getFile_path()));
                             file.setFile_page(localPdfCounter.getPage());
                             break;
                     }
@@ -460,21 +473,45 @@ public class MainController {
      * 切换至浅色主题。
      */
     public void themeLight() {
+        if (themeChangeListener != null) {
+            ThemeManager.removeListener(themeChangeListener);
+            themeChangeListener = null;
+        }
         ThemeManager.setMode(ThemeMode.LIGHT);
+        if (themeSwitch.isSelected()) {
+            themeSwitch.setSelected(false);
+        }
     }
 
     /**
      * 切换至深色主题。
      */
     public void themeDark() {
+        if (themeChangeListener != null) {
+            ThemeManager.removeListener(themeChangeListener);
+            themeChangeListener = null;
+        }
         ThemeManager.setMode(ThemeMode.DARK);
+        if (!themeSwitch.isSelected()) {
+            themeSwitch.setSelected(true);
+        }
     }
 
     /**
      * 切换为跟随系统主题。
      */
     public void themeSystem() {
+        if (themeChangeListener == null) {
+            themeChangeListener = isDark -> {
+                ThemeManager.setDarkMode(isDark);
+                themeSwitch.setSelected(isDark);
+            };
+            ThemeManager.addListener(themeChangeListener);
+        }
         ThemeManager.setMode(ThemeMode.SYSTEM);
+        if (themeSwitch.isSelected() != ThemeManager.isDarkMode()) {
+            themeSwitch.setSelected(!themeSwitch.isSelected());
+        }
     }
 
     /**
@@ -482,7 +519,7 @@ public class MainController {
      */
     public void history() {
         try {
-            new HistoryDialog(stage).show();
+            new HistoryDialog(stage);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "打开历史对话框失败", e);
         } catch (Exception e) {
@@ -844,7 +881,7 @@ public class MainController {
      * 统一更新总价标签文本，避免多处重复拼接。
      */
     private void updateTotalPriceLabel() {
-        totalAmountLabel.setText(String.format(StringSource.TOTAL_PRICE + StringSource.FORMAT + StringSource.UNIT, totalAmount));
+        totalAmountLabel.setText(String.format("总价：%.2f元", totalAmount));
     }
 
     // ==================== 右键菜单功能区 ====================
@@ -874,7 +911,7 @@ public class MainController {
             return;
         }
         try {
-            MarkDialog markDialog = new MarkDialog(stage);
+            MarkDialog markDialog = new MarkDialog(stage, fileItem);
             Optional<String> result = markDialog.showAndWait();
             result.ifPresent(fileItem::setFile_note);
         } catch (IOException e) {
@@ -891,7 +928,7 @@ public class MainController {
             return;
         }
         try {
-            MarkDialog markDialog = new MarkDialog(stage, fileItem.getFile_note());
+            MarkDialog markDialog = new MarkDialog(stage, fileItem);
             Optional<String> result = markDialog.showAndWait();
             result.ifPresent(fileItem::setFile_note);
         } catch (IOException e) {
@@ -944,7 +981,7 @@ public class MainController {
         totalAmount += subtotal;
 
         updateTotalPriceLabel();
-        SumRecord sumRecord = new SumRecord(page, price, num, spec, String.format(StringSource.FORMAT, subtotal));
+        SumRecord sumRecord = new SumRecord(page, price, num, spec, String.format("%.2f", subtotal));
         sumList.getItems().addFirst(sumRecord);
     }
 

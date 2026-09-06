@@ -2,8 +2,6 @@ package org.slk200.pdfreaderv26.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import org.slk200.pdfreaderv26.dialog.InfoDialog;
 import org.slk200.pdfreaderv26.factory.SafeIntegerSpinnerValueFactory;
 import org.slk200.pdfreaderv26.manager.SafeSpinnerManager;
 import org.slk200.pdfreaderv26.manager.SpinnerEditorManager;
@@ -15,8 +13,8 @@ import java.util.List;
  * 标记对话框控制器：收集打印设置并拼装成备注文本
  */
 public class MarkController {
-
-    // --- UI Components ---
+    @FXML
+    private Label errLabel;
     @FXML
     private ComboBox<String> paperTypeCombo;
     @FXML
@@ -46,9 +44,6 @@ public class MarkController {
     @FXML
     private TextArea noteArea;
 
-    private Stage owner;
-
-    // --- Constants for Parsing (消除魔法值) ---
     private static final String KEY_PAPER_TYPE = "纸张类型";
     private static final String KEY_PAPER_SIZE = "纸张大小";
     private static final String KEY_SIDE = "单双面";
@@ -59,17 +54,12 @@ public class MarkController {
     private static final String KEY_POST_PRESS = "印后工艺";
     private static final String KEY_NOTE = "备注";
 
-    // 数据库分类常量
     private static final String CATEGORY_PAPER_TYPE = "纸张类型";
     private static final String CATEGORY_PAPER_SIZE = "纸张大小";
     private static final String CATEGORY_BINDING = "封装工艺";
     private static final String CATEGORY_POST_PRESS = "印后工艺";
 
-    public void setOwner(Stage owner) {
-        this.owner = owner;
-    }
-
-    public void initController() {
+    public void initController(int maxPage) {
         // 1. 初始化下拉框
         initCombo(paperTypeCombo, CATEGORY_PAPER_TYPE);
         initCombo(paperSizeCombo, CATEGORY_PAPER_SIZE);
@@ -82,10 +72,9 @@ public class MarkController {
         setupToggleGroup(allPagesRadio, customPagesRadio);
 
         // 3. 初始化数值输入框 (Spinner)
-        SafeIntegerSpinnerValueFactory factory = new SafeIntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1);
-        rangeStartSpinner.setValueFactory(factory);
-        rangeEndSpinner.setValueFactory(factory);
-        copiesSpinner.setValueFactory(factory);
+        rangeStartSpinner.setValueFactory(new SafeIntegerSpinnerValueFactory(1, maxPage, 1));
+        rangeEndSpinner.setValueFactory(new SafeIntegerSpinnerValueFactory(1, maxPage, 1));
+        copiesSpinner.setValueFactory(new SafeIntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
 
         // 应用安全修饰器
         SafeSpinnerManager.makeIntegerSafe(rangeStartSpinner, 1);
@@ -239,12 +228,12 @@ public class MarkController {
             int start = parseSpinner(rangeStartSpinner);
             int end = parseSpinner(rangeEndSpinner);
             if (start < 1 || end < start) {
-                new InfoDialog("页数范围不合法：起始页需不小于1，且结束页不能小于起始页！", owner);
+                errLabel.setText("起始页需不小于1，且结束页不能小于起始页！");
                 return false;
             }
         }
         if (parseSpinner(copiesSpinner) < 1) {
-            new InfoDialog("打印份数需不小于1！", owner);
+            errLabel.setText("打印份数需不小于1！");
             return false;
         }
         return true;

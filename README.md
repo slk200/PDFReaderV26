@@ -1,5 +1,19 @@
 # PDFReaderV26
 
+### 软件截图
+<img src="snap/light.png" alt="浅色主题"/>
+<img src="snap/dark.png" alt="深色主题"/>
+
+
+### Ver 26.0.1
+* 修复了附加选项表格的加减按钮，鼠标左键按完按右键无法释放连续点击事件的bug
+* 修复了切换成跟随系统主题的错误，原主题管理器只符合Windows标准，现适配了MacOS和大部分Linux发行版（由JavaFX22+的Platform.Preferences实现）
+* 优化了针对不同平台的处理逻辑，尽可能的仅排除转换PDF的功能
+* 简化了弹窗深度，主窗口->二级窗口，不出现三级窗口
+* 优化了用户体验，给出的提示不影响用户的其他操作
+* 主窗口增加了主题切换的快捷入口
+* 框架从iText切换成PDFBox，避免了iText的高危漏洞
+
 ### Ver 26.0.0
 * 全功能适配仅支持Windows，但是除开Office转PDF之外，在MacOS和Linux使用正常
 

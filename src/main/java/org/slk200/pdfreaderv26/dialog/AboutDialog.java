@@ -8,12 +8,13 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 import org.slk200.pdfreaderv26.constant.ImageSource;
+import org.slk200.pdfreaderv26.constant.CustomCSS;
 import org.slk200.pdfreaderv26.manager.ThemeManager;
 
 import java.util.Objects;
 
 /**
- * Created by tizzer on 2019/01/26.
+ * 关于弹窗
  */
 public class AboutDialog extends Dialog<Void> {
 
@@ -21,16 +22,15 @@ public class AboutDialog extends Dialog<Void> {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about.fxml"));
         Parent content = fxmlLoader.load();
 
-        DialogPane dialogPane = getDialogPane();
-        Stage stage = (Stage) dialogPane.getScene().getWindow();
+        Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
         stage.getIcons().add(ImageSource.LOGO);
-        dialogPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/org/slk200/pdfreaderv26/css/custom.css")).toExternalForm());
-        dialogPane.getStyleClass().add("dialog-pane");
-        ThemeManager.decorate(dialogPane);
-        dialogPane.setContent(content);
-        dialogPane.getButtonTypes().add(new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE));
+
+        this.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource(CustomCSS.LOAD)).toExternalForm());
+        ThemeManager.decorate(this.getDialogPane());
+        this.getDialogPane().setContent(content);
+        this.getDialogPane().getButtonTypes().add(new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE));
         this.setTitle("关于");
         this.initOwner(owner);
-        this.showAndWait();
+        this.show();
     }
 }
